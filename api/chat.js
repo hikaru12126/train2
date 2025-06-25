@@ -1,5 +1,6 @@
 // /api/chat.js（Vercel サーバレスAPI Route用）
 // 必要なパッケージのimport（省略せず載せています）
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // 必ず一番上に
 import { parse } from 'csv-parse/sync';
 import axios from 'axios';
 
