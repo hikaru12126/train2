@@ -1,30 +1,59 @@
-// routes/chat.js
-const express = require('express');
-const multer = require('multer');
-const { parse } = require('csv-parse/sync');
-const axios = require('axios');
-const router = express.Router();
+// /api/chat.js
+import { parse } from 'csv-parse/sync';
+import axios from 'axios';
 
-const upload = multer();
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+// この特殊な関数でmultipart(form-data)を自前で処理します
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
-router.post('/chat', upload.single('csv'), async (req, res) => {
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // multipart/form-data対応（ファイルアップロード用）
+  const busboy = (await import('busboy')).default;
+  let userInstruction = '';
+  let csvBuffer = null;
+
+  await new Promise((resolve, reject) => {
+    const bb = busboy({ headers: req.headers });
+
+    bb.on('file', (name, file) => {
+      const chunks = [];
+      file.on('data', chunk => chunks.push(chunk));
+      file.on('end', () => {
+        if (name === 'csv') {
+          csvBuffer = Buffer.concat(chunks);
+        }
+      });
+    });
+
+    bb.on('field', (name, val) => {
+      if (name === 'userInstruction') userInstruction = val;
+    });
+
+    bb.on('finish', resolve);
+    bb.on('error', reject);
+
+    req.pipe(bb);
+  });
+
   try {
-    const { userInstruction } = req.body;
-    const csvFile = req.file;
-    if (!csvFile) {
+    if (!csvBuffer) {
       return res.status(400).json({ error: 'CSVファイルがありません' });
     }
-    const records = parse(csvFile.buffer, { columns: true });
-    // --- カラム説明自動生成（必要なら編集推奨） ---
+    const records = parse(csvBuffer, { columns: true });
+
+    // カラム説明
     const columnDesc = Object.keys(records[0])
       .map(k => `・${k}：${k}の内容`)
       .join('\n');
 
-    // --- 改善されたプロンプトを作成 ---
     const prompt = `
-
-
 【カラム説明】
 ${columnDesc}
 
@@ -33,10 +62,9 @@ ${JSON.stringify(records.slice(0, 30), null, 2)}
 
 【依頼内容】
 ${userInstruction}
-
-
 `;
 
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
     const model = 'gpt-3.5-turbo';
 
     const response = await axios.post(
@@ -52,10 +80,9 @@ ${userInstruction}
         },
       }
     );
-    res.json({ result: response.data.choices[0].message.content });
+
+    res.status(200).json({ result: response.data.choices[0].message.content });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
-
-module.exports = router;
+}
