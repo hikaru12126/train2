@@ -18,10 +18,10 @@ function App() {
       formData.append('csv', file);
       formData.append('userInstruction', instruction);
 
-      const res = await fetch('http://localhost:3001/api/chat', {
-        method: 'POST',
-        body: formData,
-      });
+    const res = await fetch('/api/chat', {
+    method: 'POST',
+　  body: formData,
+　　});
       const data = await res.json();
       setResult(data.result || data.error);
     } catch (e) {
