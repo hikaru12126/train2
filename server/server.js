@@ -9,6 +9,6 @@ app.use(express.json());
 app.use('/api', chatRouter);
 
 const PORT = 3001;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Listening on port ${PORT}`);
 });
