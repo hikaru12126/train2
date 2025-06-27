@@ -19,7 +19,7 @@ function App() {
       formData.append('userInstruction', instruction);
 
       // APIのパスをExpressサーバに揃える
-      const res = await fetch('http://localhost:3001/api/chat', {
+      const res = await fetch('http://10.65.35.80/api/chat', {
         method: 'POST',
         body: formData,
       });
