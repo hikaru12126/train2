@@ -1,22 +1,24 @@
-import { IncomingForm } from 'formidable';
-import { parse as csvParse } from 'csv-parse/sync';
-import axios from 'axios';
+const { IncomingForm } = require('formidable');
+const { parse: csvParse } = require('csv-parse/sync');
+const axios = require('axios');
+const fs = require('fs');
 
-export const config = {
+// Vercel Serverless Functions用の設定（bodyParser無効化）
+module.exports.config = {
   api: {
     bodyParser: false, // form-data用
   },
 };
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
 
-  // formidableでmultipart/form-dataをパース
   const form = new IncomingForm();
 
+  // formidableでmultipart/form-dataをパース
   form.parse(req, async (err, fields, files) => {
     if (err) {
       res.status(500).json({ error: 'form-data parse error' });
@@ -28,10 +30,11 @@ export default async function handler(req, res) {
       const csvFile = files.csv;
 
       if (!csvFile) {
-        return res.status(400).json({ error: 'CSVファイルがありません' });
+        res.status(400).json({ error: 'CSVファイルがありません' });
+        return;
       }
 
-      // formidableの場合、ファイルはパスで渡されます
+      // formidableの場合、ファイルはpathで渡されます
       const fileBuffer = await fs.promises.readFile(csvFile.filepath);
       const records = csvParse(fileBuffer, { columns: true });
 
@@ -72,6 +75,4 @@ ${userInstruction}
       res.status(500).json({ error: error.message });
     }
   });
-}
-
-import fs from 'fs';
+};
