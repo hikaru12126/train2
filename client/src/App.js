@@ -8,7 +8,7 @@ function App() {
 
   const handleSend = async () => {
     if (!file) {
-      setResult("CSVファイルを選択してください");
+      setResult('CSVファイルを選択してください');
       return;
     }
     setLoading(true);
@@ -18,10 +18,11 @@ function App() {
       formData.append('csv', file);
       formData.append('userInstruction', instruction);
 
-  const res = await fetch('/api/chat', {
-  method: 'POST',
-  body: formData,
-  });
+      // APIのパスをExpressサーバに揃える
+      const res = await fetch('http://localhost:3001/api/chat', {
+        method: 'POST',
+        body: formData,
+      });
       const data = await res.json();
       setResult(data.result || data.error);
     } catch (e) {
@@ -29,21 +30,6 @@ function App() {
     }
     setLoading(false);
   };
-
-  function extractBase64Image(text) {
-    if (!text) return null;
-    const match = text.match(/\[IMAGE_START\]([\s\S]+?)\[IMAGE_END\]/);
-    if (match) {
-      return match[1].replace(/\s/g, '');
-    }
-    const match2 = text.match(/data:image\/png;base64,[a-zA-Z0-9+/=]+/);
-    if (match2) {
-      return match2[0];
-    }
-    return null;
-  }
-
-  const base64Img = extractBase64Image(result);
 
   return (
     <div>
@@ -59,25 +45,13 @@ function App() {
         rows={5}
         cols={60}
         placeholder="指示を入力してください"
-      />
-      <br />
+      /><br />
       <button onClick={handleSend} disabled={loading}>送信</button>
       {loading && <div>送信中...</div>}
 
       <div style={{ marginTop: 20 }}>
         <strong>結果:</strong>
         <pre style={{ whiteSpace: 'pre-wrap' }}>{result}</pre>
-        {base64Img && (
-          <img
-            src={
-              base64Img.startsWith('data:')
-                ? base64Img
-                : 'data:image/png;base64,' + base64Img
-            }
-            alt="AI生成グラフ"
-            style={{ maxWidth: 600, display: 'block', marginTop: 16 }}
-          />
-        )}
       </div>
     </div>
   );
