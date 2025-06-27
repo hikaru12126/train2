@@ -1,78 +1,60 @@
-const { IncomingForm } = require('formidable');
-const { parse: csvParse } = require('csv-parse/sync');
-const axios = require('axios');
-const fs = require('fs');
+import React, { useState } from 'react';
 
-// Vercel Serverless Functions用の設定（bodyParser無効化）
-module.exports.config = {
-  api: {
-    bodyParser: false, // form-data用
-  },
-};
+function App() {
+  const [instruction, setInstruction] = useState('');
+  const [file, setFile] = useState(null);
+  const [result, setResult] = useState('');
+  const [loading, setLoading] = useState(false);
 
-module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
-
-  const form = new IncomingForm();
-
-  // formidableでmultipart/form-dataをパース
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      res.status(500).json({ error: 'form-data parse error' });
+  const handleSend = async () => {
+    if (!file) {
+      setResult('CSVファイルを選択してください');
       return;
     }
-
+    setLoading(true);
+    setResult('');
     try {
-      const userInstruction = fields.userInstruction;
-      const csvFile = files.csv;
+      const formData = new FormData();
+      formData.append('csv', file);
+      formData.append('userInstruction', instruction);
 
-      if (!csvFile) {
-        res.status(400).json({ error: 'CSVファイルがありません' });
-        return;
-      }
-
-      // formidableの場合、ファイルはpathで渡されます
-      const fileBuffer = await fs.promises.readFile(csvFile.filepath);
-      const records = csvParse(fileBuffer, { columns: true });
-
-      const columnDesc = Object.keys(records[0])
-        .map(k => `・${k}：${k}の内容`)
-        .join('\n');
-
-      const prompt = `
-【カラム説明】
-${columnDesc}
-
-【CSVデータ（抜粋）】
-${JSON.stringify(records.slice(0, 30), null, 2)}
-
-【依頼内容】
-${userInstruction}
-`;
-
-      const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-      const model = 'gpt-3.5-turbo';
-
-      const response = await axios.post(
-        'https://api.openai.com/v1/chat/completions',
-        {
-          model: model,
-          messages: [{ role: 'user', content: prompt }],
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${OPENAI_API_KEY}`,
-          },
-        }
-      );
-
-      res.status(200).json({ result: response.data.choices[0].message.content });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+      // APIのパスをExpressサーバに揃える
+      const res = await fetch('http://localhost:3001/api/chat', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      setResult(data.result || data.error);
+    } catch (e) {
+      setResult('エラーが発生しました');
     }
-  });
-};
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <h2>ChatGPT × CSV参照デモ</h2>
+      <input
+        type="file"
+        accept=".csv"
+        onChange={e => setFile(e.target.files[0])}
+      /><br />
+      <textarea
+        value={instruction}
+        onChange={e => setInstruction(e.target.value)}
+        rows={5}
+        cols={60}
+        placeholder="指示を入力してください"
+      /><br />
+      <button onClick={handleSend} disabled={loading}>送信</button>
+      {loading && <div>送信中...</div>}
+
+      <div style={{ marginTop: 20 }}>
+        <strong>結果:</strong>
+        <pre style={{ whiteSpace: 'pre-wrap' }}>{result}</pre>
+      </div>
+    </div>
+  );
+}
+
+export default App;
