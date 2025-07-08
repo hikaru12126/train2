@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "train2",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -10,21 +10,21 @@
     "axios": "^1.10.0",
     "csv-parse": "^5.6.0",
     "formidable": "^3.5.4",
+    "next": "^15.3.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "jest"
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "next",
+      "next/core-web-vitals"
     ]
   },
   "browserslist": {
@@ -39,7 +39,7 @@
       "last 1 safari version"
     ]
   },
-  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "description": "This project is based on Next.js.",
   "main": "index.js",
   "keywords": [],
   "author": "",
