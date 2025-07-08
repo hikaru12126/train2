@@ -18,8 +18,8 @@ function App() {
       formData.append('csv', file);
       formData.append('userInstruction', instruction);
 
-      // APIのパスをExpressサーバに揃える
-      const res = await fetch('http://10.65.1.1:3001/api/chat', {
+      // ★Vercelでは/api/chatにfetch
+      const res = await fetch('/api/chat', {
         method: 'POST',
         body: formData,
       });
