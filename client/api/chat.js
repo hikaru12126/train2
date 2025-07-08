@@ -1,60 +1,48 @@
-import React, { useState } from 'react';
+// /pages/api/chat.js
+import formidable from 'formidable';
+import fs from 'fs';
+import csvParser from 'csv-parser';
 
-function App() {
-  const [instruction, setInstruction] = useState('');
-  const [file, setFile] = useState(null);
-  const [result, setResult] = useState('');
-  const [loading, setLoading] = useState(false);
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
-  const handleSend = async () => {
-    if (!file) {
-      setResult('CSVファイルを選択してください');
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  const form = new formidable.IncomingForm();
+
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      res.status(500).json({ error: 'ファイル解析エラー' });
       return;
     }
-    setLoading(true);
-    setResult('');
-    try {
-      const formData = new FormData();
-      formData.append('csv', file);
-      formData.append('userInstruction', instruction);
-
-      // APIのパスをExpressサーバに揃える
-      const res = await fetch('http://10.65.35.80:3001/api/chat', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      setResult(data.result || data.error);
-    } catch (e) {
-      setResult('エラーが発生しました');
+    const userInstruction = fields.userInstruction;
+    const file = files.csv;
+    if (!file || !file.filepath) {
+      res.status(400).json({ error: 'CSVファイルがありません' });
+      return;
     }
-    setLoading(false);
-  };
 
-  return (
-    <div>
-      <h2>ChatGPT × CSV参照デモ</h2>
-      <input
-        type="file"
-        accept=".csv"
-        onChange={e => setFile(e.target.files[0])}
-      /><br />
-      <textarea
-        value={instruction}
-        onChange={e => setInstruction(e.target.value)}
-        rows={5}
-        cols={60}
-        placeholder="指示を入力してください"
-      /><br />
-      <button onClick={handleSend} disabled={loading}>送信</button>
-      {loading && <div>送信中...</div>}
-
-      <div style={{ marginTop: 20 }}>
-        <strong>結果:</strong>
-        <pre style={{ whiteSpace: 'pre-wrap' }}>{result}</pre>
-      </div>
-    </div>
-  );
+    const results = [];
+    fs.createReadStream(file.filepath)
+      .pipe(csvParser())
+      .on('data', (row) => results.push(row))
+      .on('end', () => {
+        // ★ここでChatGPT APIを呼ぶ処理を追加可能
+        // 例: CSVを元にGPT回答を作る
+        // ここでは仮に件数・カラム名を表示
+        res.status(200).json({
+          result: `CSV行数: ${results.length}\n1行目: ${JSON.stringify(results[0])}\nユーザー指示: ${userInstruction}`,
+        });
+      })
+      .on('error', () => {
+        res.status(500).json({ error: 'CSVパースエラー' });
+      });
+  });
 }
-
-export default App;
