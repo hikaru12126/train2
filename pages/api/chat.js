@@ -1,7 +1,6 @@
-// /pages/api/chat.js
 import formidable from 'formidable';
-import fs from 'fs';
 import csvParser from 'csv-parser';
+import { Readable } from 'stream';
 
 export const config = {
   api: {
@@ -9,44 +8,41 @@ export const config = {
   },
 };
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
-
-  // v2以降はこれでOK
-  const form = formidable();
+export default function handler(req, res) {
+  // formidableをバッファで受ける設定
+  const form = formidable({ multiples: false });
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
       res.status(500).json({ error: 'ファイル解析エラー' });
       return;
     }
-    const userInstruction = fields.userInstruction;
+    const userInstruction = fields.userInstruction?.toString() || '';
     const file = files.csv;
 
-    // formidable v2以降: file.filepath でパスが取得可能
-    if (!file || !file.filepath) {
+    // formidable v2以降: file._writeStream.buffersでバッファ取得
+    let buffer =
+      file && file._writeStream && file._writeStream.buffers
+        ? Buffer.concat(file._writeStream.buffers)
+        : null;
+
+    if (!buffer || buffer.length === 0) {
       res.status(400).json({ error: 'CSVファイルがありません' });
       return;
     }
 
+    // バッファ→ReadableでcsvParserに渡す
     const results = [];
-    try {
-      fs.createReadStream(file.filepath)
-        .pipe(csvParser())
-        .on('data', (row) => results.push(row))
-        .on('end', () => {
-          res.status(200).json({
-            result: `CSV行数: ${results.length}\n1行目: ${JSON.stringify(results[0])}\nユーザー指示: ${userInstruction}`,
-          });
-        })
-        .on('error', () => {
-          res.status(500).json({ error: 'CSVパースエラー' });
+    Readable.from(buffer)
+      .pipe(csvParser())
+      .on('data', (row) => results.push(row))
+      .on('end', () => {
+        res.status(200).json({
+          result: `CSV行数: ${results.length}\n1行目: ${JSON.stringify(results[0])}\nユーザー指示: ${userInstruction}`,
         });
-    } catch (e) {
-      res.status(500).json({ error: 'サーバーエラー' });
-    }
+      })
+      .on('error', () => {
+        res.status(500).json({ error: 'CSVパースエラー' });
+      });
   });
 }
