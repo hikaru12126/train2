@@ -1,6 +1,7 @@
 import formidable from 'formidable';
 import csvParser from 'csv-parser';
 import { Readable } from 'stream';
+import fs from 'fs';
 
 export const config = {
   api: {
@@ -24,19 +25,16 @@ export default async function handler(req, res) {
       return;
     }
 
-    // 最新のformidableではtoBufferで取得
-    let buffer;
-    if (file.toBuffer) {
+    // formidable v2は fileは一時ファイル (file.filepath) になる
+    let buffer = null;
+    if (file.filepath && fs.existsSync(file.filepath)) {
+      buffer = fs.readFileSync(file.filepath);
+    } else if (file.toBuffer) {
       buffer = await file.toBuffer();
-    } else {
-      // fallback: v1系
-      buffer = file && file._writeStream && file._writeStream.buffers
-        ? Buffer.concat(file._writeStream.buffers)
-        : null;
     }
 
     if (!buffer || buffer.length === 0) {
-      res.status(400).json({ error: 'CSVファイルがありません2' });
+      res.status(400).json({ error: 'CSVファイルがありません3' });
       return;
     }
 
