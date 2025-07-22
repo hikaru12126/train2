@@ -59,8 +59,8 @@ function App() {
               handleSend();
             }
           }}
-        />
-        /><br />
+        ></textarea>
+        <br />
         <button onClick={handleSend} disabled={loading} className="neo-button">
           送信
         </button>
