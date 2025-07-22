@@ -54,8 +54,29 @@ export default async function handler(req, res) {
     const tableText = tableSample
       .map(row => JSON.stringify(row)).join('\n');
 
-    // --- プロンプト修正版 ---
+    // --- プロンプト強化＆例示追加 ---
     const prompt = `
+以下はCSVの一部データです。指示に従い分析や解説を行い、もしグラフ生成の指示があれば、以下のフォーマットで必ずVega-Lite形式のJSONを出力してください。
+グラフ部分は
+---BEGIN VEGA---
+{Vega-Lite JSON}
+---END VEGA---
+の間に必ずJSONのみ記載すること。
+説明文→Vega部分の順で出力してください。
+
+例：
+---BEGIN VEGA---
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "来場者数推移グラフ",
+  "data": {"values": [ {"月":"1月","来場者数":123}, {"月":"2月","来場者数":200} ]},
+  "mark": "line",
+  "encoding": {
+    "x": {"field": "月", "type": "ordinal"},
+    "y": {"field": "来場者数", "type": "quantitative"}
+  }
+}
+---END VEGA---
 
 ${tableText}
 
@@ -66,10 +87,13 @@ ${tableText}
       const chatCompletion = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
-          { role: "system", content: "あなたは交通データの専門家です。" },
+          {
+            role: "system",
+            content: "あなたは交通データの専門家であり、もしグラフ化が指示された場合はVega-Lite形式のJSONとして---BEGIN VEGA---と---END VEGA---の間に必ずJSONコードのみ出力してください。"
+          },
           { role: "user", content: prompt }
         ],
-        max_tokens: 1000,
+        max_tokens: 1500,
         temperature: 0.2,
       });
 
