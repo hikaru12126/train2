@@ -54,24 +54,12 @@ export default async function handler(req, res) {
     const tableText = tableSample
       .map(row => JSON.stringify(row)).join('\n');
 
-    // AIへのプロンプト（グラフJSONの指示を追加！）
+    // --- プロンプト修正版 ---
     const prompt = `
-あなたは交通データ解析エキスパートです。
-下記は速度データCSVのサンプルです（ヘッダーは1行目）。
---- CSVサンプル ---
+
 ${tableText}
----
-このデータ全体を使って、ユーザー指示
+
 「${userInstruction}」
-について
-1. 日本語で要約や傾向、平均速度など解説し
-2. 次にVega-Lite形式のグラフ定義(JSONのみ)も必ず以下のように出力してください。
-
----BEGIN VEGA---
-（ここにVega-Lite JSONを出力）
----END VEGA---
-
-必ずVega-Lite定義部分はJSON形式で「---BEGIN VEGA---」と「---END VEGA---」の間に記載してください。
 `;
 
     try {
@@ -86,6 +74,9 @@ ${tableText}
       });
 
       const aiText = chatCompletion.choices?.[0]?.message?.content || 'AI応答なし';
+      // デバッグ：AI生成内容をサーバーログに出す
+      console.log('[AI GPT応答]', aiText);
+
       res.status(200).json({ result: aiText });
     } catch (apiError) {
       res.status(500).json({ error: 'OpenAI API連携エラー' });
