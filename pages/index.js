@@ -1,5 +1,37 @@
-// ...existing code...
-  return (
+import React, { useState } from 'react';
+
+function App() {
+  const [instruction, setInstruction] = useState('');
+  const [file, setFile] = useState(null);
+  const [result, setResult] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSend = async () => {
+    if (!file) {
+      setResult('CSVファイルを選択してください');
+      return;
+    }
+    setLoading(true);
+    setResult('');
+    try {
+      const formData = new FormData();
+      formData.append('csv', file);
+      formData.append('userInstruction', instruction);
+
+      // ★Vercelでは/api/chatにfetch
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      setResult(data.result || data.error);
+    } catch (e) {
+      setResult('エラーが発生しました');
+    }
+    setLoading(false);
+  };
+
+   return (
     <div className="neo-bg">
       <div className="neo-container">
         <h2 className="neo-title">ChatGPT × CSV参照デモ</h2>
@@ -104,4 +136,5 @@
       `}</style>
     </div>
   );
-// ...existing code...
+
+export default App;
