@@ -55,7 +55,7 @@ export default async function handler(req, res) {
       .map(row => JSON.stringify(row)).join('\n');
 
     // --- プロンプト強化＆例示追加 ---
-    const prompt = `
+const prompt = `
 【注意】グラフはVega-Lite形式のJSONのみ、Pythonやmatplotlibのコードは禁止です。
 出力例：
 ---BEGIN VEGA---
