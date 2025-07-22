@@ -31,7 +31,7 @@ function App() {
     setLoading(false);
   };
 
-   return (
+  return (
     <div className="neo-bg">
       <div className="neo-container">
         <h2 className="neo-title">ChatGPT × CSV参照デモ</h2>
@@ -136,5 +136,6 @@ function App() {
       `}</style>
     </div>
   );
+}
 
 export default App;
