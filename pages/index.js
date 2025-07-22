@@ -34,7 +34,7 @@ function App() {
   return (
     <div className="neo-bg">
       <div className="neo-container">
-        <h2 className="neo-title">ChatGPT × CSV参照デモ</h2>
+        <h2 className="neo-title">JRCM 走行解析アプリ</h2>
         <input
           type="file"
           accept=".csv"
