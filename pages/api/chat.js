@@ -56,24 +56,16 @@ export default async function handler(req, res) {
 
     // --- プロンプト強化＆例示追加 ---
     const prompt = `
-以下はCSVの一部データです。指示に従い分析や解説を行い、もしグラフ生成の指示があれば、以下のフォーマットで必ずVega-Lite形式のJSONを出力してください。
-グラフ部分は
----BEGIN VEGA---
-{Vega-Lite JSON}
----END VEGA---
-の間に必ずJSONのみ記載すること。
-説明文→Vega部分の順で出力してください。
-
-例：
+【注意】グラフはVega-Lite形式のJSONのみ、Pythonやmatplotlibのコードは禁止です。
+出力例：
 ---BEGIN VEGA---
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "来場者数推移グラフ",
-  "data": {"values": [ {"月":"1月","来場者数":123}, {"月":"2月","来場者数":200} ]},
+  "data": {"values": [{"時間":"9:28","速度":14},{"時間":"9:29","速度":21},{"時間":"9:30","速度":34}]},
   "mark": "line",
   "encoding": {
-    "x": {"field": "月", "type": "ordinal"},
-    "y": {"field": "来場者数", "type": "quantitative"}
+    "x": {"field": "時間", "type": "ordinal", "title":"時間"},
+    "y": {"field": "速度", "type": "quantitative", "title":"速度 (km/h)"}
   }
 }
 ---END VEGA---
