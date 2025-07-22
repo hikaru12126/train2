@@ -35,8 +35,11 @@ function App() {
       if (data.result) {
         const m = data.result.match(/---BEGIN VEGA---([\s\S]+?)---END VEGA---/);
         if (m && m[1]) {
+          let vegaRaw = m[1].trim();
+          // もし```jsonやバッククォートで囲まれていたら除去（安全対策）
+          vegaRaw = vegaRaw.replace(/^```json\s*/, '').replace(/```$/, '').trim();
           try {
-            setVegaSpec(JSON.parse(m[1].trim()));
+            setVegaSpec(JSON.parse(vegaRaw));
           } catch (e) {
             setVegaSpec(null);
           }
@@ -88,12 +91,19 @@ function App() {
           <strong>結果:</strong>
           <pre style={{ whiteSpace: 'pre-wrap' }}>{result ? result.replace(/---BEGIN VEGA---[\s\S]+---END VEGA---/, '') : ''}</pre>
         </div>
+
         {/* Vegaグラフを出力 */}
         {vegaSpec && (
           <div style={{ marginTop: 24 }}>
             <VegaLite spec={vegaSpec} />
           </div>
         )}
+
+        {/* デバッグ用にAI生応答も表示（開閉可能） */}
+        <details>
+          <summary>AI応答raw表示（開くと詳細）</summary>
+          <pre style={{ whiteSpace: 'pre-wrap', background: '#f8f9fa', fontSize: '12px' }}>{result}</pre>
+        </details>
       </div>
       {/* ... スタイル省略 ... */}
     </div>
