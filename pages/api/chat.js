@@ -77,7 +77,7 @@ ${tableText}
     // OpenAI API呼び出し
     try {
       const chatCompletion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo", // GPT-4使う場合は "gpt-4o" など
+        model: "gpt-4o", // GPT-4使う場合は "gpt-4o" など
         messages: [
           { role: "system", content: "あなたは交通データの専門家です。" },
           { role: "user", content: prompt }
