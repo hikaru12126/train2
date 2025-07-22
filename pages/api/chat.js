@@ -10,17 +10,13 @@ export const config = {
   },
 };
 
-// 環境変数にOPENAI_API_KEYをセットしておく
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export default async function handler(req, res) {
-  console.log('=== [DEBUG] API invoked ===');
   const form = formidable({ multiples: false });
 
   form.parse(req, async (err, fields, files) => {
-    console.log('=== [DEBUG] form.parse called ===');
     if (err) {
-      console.log('[DEBUG] ファイル解析エラー:', err);
       res.status(500).json({ error: 'ファイル解析エラー' });
       return;
     }
@@ -33,11 +29,9 @@ export default async function handler(req, res) {
     let buffer = null;
     if (filepath && fs.existsSync(filepath)) {
       buffer = fs.readFileSync(filepath);
-      console.log('[DEBUG] バッファ取得成功・サイズ:', buffer.length);
     }
 
     if (!buffer || buffer.length === 0) {
-      console.log('[DEBUG] CSVファイルがありませんB: buffer未取得');
       res.status(400).json({ error: 'CSVファイルがありませんB' });
       return;
     }
@@ -51,7 +45,6 @@ export default async function handler(req, res) {
         .on('end', resolve)
         .on('error', reject);
     });
-    console.log('[DEBUG] CSVパース完了: ', results.length, '行');
 
     // 入力データをまとめてAIに送る（CSV行数多い時は先頭数行だけを送る工夫推奨）
     const tableSample =
@@ -61,35 +54,40 @@ export default async function handler(req, res) {
     const tableText = tableSample
       .map(row => JSON.stringify(row)).join('\n');
 
-    // AIへのプロンプト
+    // AIへのプロンプト（グラフJSONの指示を追加！）
     const prompt = `
 あなたは交通データ解析エキスパートです。
 下記は速度データCSVのサンプルです（ヘッダーは1行目）。
 --- CSVサンプル ---
 ${tableText}
---- 
+---
 このデータ全体を使って、ユーザー指示
 「${userInstruction}」
-へ自然言語で返答・要約・計算してください。
-サマリーには平均速度や傾向も日本語で含めてください。
+について
+1. 日本語で要約や傾向、平均速度など解説し
+2. 次にVega-Lite形式のグラフ定義(JSONのみ)も必ず以下のように出力してください。
+
+---BEGIN VEGA---
+（ここにVega-Lite JSONを出力）
+---END VEGA---
+
+必ずVega-Lite定義部分はJSON形式で「---BEGIN VEGA---」と「---END VEGA---」の間に記載してください。
 `;
 
-    // OpenAI API呼び出し
     try {
       const chatCompletion = await openai.chat.completions.create({
-        model: "gpt-4o", // GPT-4使う場合は "gpt-4o" など
+        model: "gpt-4o",
         messages: [
           { role: "system", content: "あなたは交通データの専門家です。" },
           { role: "user", content: prompt }
         ],
-        max_tokens: 600,
+        max_tokens: 1000,
         temperature: 0.2,
       });
 
       const aiText = chatCompletion.choices?.[0]?.message?.content || 'AI応答なし';
       res.status(200).json({ result: aiText });
     } catch (apiError) {
-      console.error('[DEBUG] OpenAI APIエラー:', apiError);
       res.status(500).json({ error: 'OpenAI API連携エラー' });
     }
   });
