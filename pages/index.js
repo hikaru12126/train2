@@ -47,7 +47,19 @@ function App() {
           rows={5}
           cols={60}
           placeholder="指示を入力してください"
-          className="neo-textarea"
+          className="futuristic-textarea"
+          onKeyDown={e => {
+            if (
+              e.key === 'Enter' &&
+              !e.shiftKey &&
+              !e.ctrlKey &&
+              !e.altKey
+            ) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
+        />
         /><br />
         <button onClick={handleSend} disabled={loading} className="neo-button">
           送信
