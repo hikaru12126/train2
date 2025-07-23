@@ -21,11 +21,15 @@ export default async function handler(req, res) {
       return;
     }
 
+    // ユーザ指示文
     const userInstruction = fields?.userInstruction?.toString?.() || '';
+
+    // ファイル情報取得
     const fileRaw = files?.csv;
     const file = Array.isArray(fileRaw) ? fileRaw[0] : fileRaw;
-    const filepath = file.filepath || file.path;
+    const filepath = file?.filepath || file?.path;
 
+    // ファイル内容取得
     let buffer = null;
     if (filepath && fs.existsSync(filepath)) {
       buffer = fs.readFileSync(filepath);
@@ -36,6 +40,7 @@ export default async function handler(req, res) {
       return;
     }
 
+    // CSVパース
     const results = [];
     await new Promise((resolve, reject) => {
       Readable.from(buffer)
@@ -45,9 +50,11 @@ export default async function handler(req, res) {
         .on('error', reject);
     });
 
+    // サンプルデータ生成
     const tableSample = results.length > 10 ? results.slice(0, 10) : results;
     const tableText = tableSample.map(row => JSON.stringify(row)).join('\n');
 
+    // プロンプト文生成
     const prompt = `
 以下はCSVの一部データです。指示に従い分析や解説を行い、もしグラフ生成の指示があれば、以下のフォーマットで必ずVega-Lite形式のJSONを出力してください。
 グラフ部分は
@@ -91,10 +98,10 @@ ${tableText}
       });
 
       const aiText = chatCompletion.choices?.[0]?.message?.content || 'AI応答なし';
-
       res.status(200).json({ result: aiText });
     } catch (apiError) {
       res.status(500).json({ error: 'OpenAI API連携エラー' });
     }
-  }); // form.parseのコールバック終了
-} // handler関数終了
+  }); 
+}; 
+
