@@ -94,6 +94,7 @@ ${tableText}
 
       res.status(200).json({ result: aiText });
     } catch (apiError) {
-            res.status(500).json({ error: 'OpenAI API連携エラー' });
-          }
-      }
+      res.status(500).json({ error: 'OpenAI API連携エラー' });
+    }
+  }); // form.parseのコールバック終了
+} // handler関数終了
