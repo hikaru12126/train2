@@ -118,7 +118,7 @@ ${tableText}
         console.error('OpenAI API ERROR:', apiError);
         res.status(500).json({
           error: 'OpenAI API連携エラー',
-          detail: apiError?.message || JSON.stringify(apiError)
+          detail: apiError?.toString() || JSON.stringify(apiError)
         });
       }
     } catch (csvError) {
