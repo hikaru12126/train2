@@ -1,5 +1,3 @@
-import 'dotenv/config';
-
 import formidable from 'formidable';
 import csvParser from 'csv-parser';
 import { Readable } from 'stream';
