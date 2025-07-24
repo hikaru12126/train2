@@ -26,7 +26,7 @@ export default async function handler(req, res) {
 
     // ユーザ指示文
     const userInstruction = fields?.userInstruction?.toString?.() || '';
-    // オプション：ユーザー識別用の項目をfieldsから取得するならここ
+    // オプション：ユーザー識別用
     const userEmail = fields?.userEmail?.toString?.() || '';
 
     // ファイル情報取得
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
       const tableSample = results.length > 10 ? results.slice(0, 10) : results;
       const tableText = tableSample.map(row => JSON.stringify(row)).join('\n');
 
-      // プロンプト文生成
+      // プロンプト作成
       const prompt = `
 以下はCSVの一部データです。指示に従い分析や解説を行い、もしグラフ生成の指示があれば、以下のフォーマットで必ずVega-Lite形式のJSONを出力してください。
 グラフ部分は
@@ -106,18 +106,21 @@ ${tableText}
         const aiText = chatCompletion.choices?.[0]?.message?.content || 'AI応答なし';
 
         // --- ログ出力 ここから ---
-        const logDir = path.join(process.cwd(), 'logs');
-        if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+        // Vercel本番環境ではファイル書き込みをスキップ
+        if (process.env.VERCEL !== "1") {
+          const logDir = path.join(process.cwd(), 'logs');
+          if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
 
-        const logData = {
-          time: requestAt,
-          user: userEmail,
-          file: file?.originalFilename || '',
-          instruction: userInstruction ? userInstruction.replace(/\n/g, ' ') : '',
-          aiSummary: aiText.slice(0, 500).replace(/\n/g, ' '),
-        };
-        const csvLine = `"${logData.time}","${logData.user}","${logData.file}","${logData.instruction.replace(/"/g, '""')}","${logData.aiSummary.replace(/"/g, '""')}"\n`;
-        fs.appendFileSync(path.join(logDir, 'accesslog.csv'), csvLine, 'utf8');
+          const logData = {
+            time: requestAt,
+            user: userEmail,
+            file: file?.originalFilename || '',
+            instruction: userInstruction ? userInstruction.replace(/\n/g, ' ') : '',
+            aiSummary: aiText.slice(0, 500).replace(/\n/g, ' '),
+          };
+          const csvLine = `"${logData.time}","${logData.user}","${logData.file}","${logData.instruction.replace(/"/g, '""')}","${logData.aiSummary.replace(/"/g, '""')}"\n`;
+          fs.appendFileSync(path.join(logDir, 'accesslog.csv'), csvLine, 'utf8');
+        }
         // --- ログ出力 ここまで ---
 
         res.status(200).json({ result: aiText });
