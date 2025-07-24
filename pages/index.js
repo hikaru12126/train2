@@ -94,115 +94,100 @@ function App() {
             <VegaLite spec={vegaSpec} />
           </div>
         )}
-
-        <details>
-          <summary>AI応答raw表示（開くと詳細）</summary>
-          <pre style={{ whiteSpace: 'pre-wrap', background: '#fff0f0', fontSize: '12px' }}>{result}</pre>
-        </details>
       </div>
 <style>{`
-  .futuristic-bg {
+  .whiteblue-bg {
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f6fa 0%, #e0e3ea 100%);
+    background: linear-gradient(135deg, #e3f6fd 0%, #ffffff 100%);
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  .futuristic-container {
-    background: #f8f9fb;
-    border-radius: 28px;
-    box-shadow: 0 8px 40px #b0b3b8, 0 0 0px #e0e3ea inset;
-    padding: 56px 40px 36px 40px;
-    max-width: 540px;   /* 元のサイズを維持 */
-    width: 100%;        /* レスポンシブ */
-    border: 2px solid #e0e3ea;
+  .whiteblue-container {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 3px 24px #bde7f7bb, 0 0 0px #e3f6fd inset;
+    padding: 42px 32px 28px 32px;
+    max-width: 540px;
+    width: 100%;
+    border: 1.5px solid #e3f6fd;
     position: relative;
   }
-  .futuristic-title {
-    color: #d32f2f;
-    font-family: 'Orbitron', 'Segoe UI', sans-serif;
-    font-size: 2.3rem;
+  .whiteblue-title {
+    color: #d32f2f; /* 赤 */
+    font-family: 'Segoe UI', 'Meiryo', sans-serif;
+    font-size: 2rem;
     text-align: center;
-    margin-bottom: 38px;
-    letter-spacing: 3px;
-    text-shadow: 0 0 16px #ffb3b3, 0 0 2px #fff;
-    border-radius: 12px;
-    padding: 12px 0;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+    font-weight: bold;
   }
-  .futuristic-input, .futuristic-textarea {
+  .whiteblue-input, .whiteblue-textarea {
     width: 100%;
-    background: #f5f6fa;
-    color: #d32f2f;
-    border: 2px solid #b0b3b8;
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 20px;
-    font-size: 1.08rem;
+    background: #f0fbff;
+    color: #222;
+    border: 1.5px solid #bde7f7;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 16px;
+    font-size: 1rem;
     font-family: 'Segoe UI', 'monospace';
-    transition: border 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 12px #e0e3ea33;
+    transition: border 0.2s;
+    box-shadow: 0 1px 6px #e3f6fd55;
   }
-  .futuristic-input:focus, .futuristic-textarea:focus {
-    border: 2px solid #d32f2f;
+  .whiteblue-input:focus, .whiteblue-textarea:focus {
+    border: 1.5px solid #80bfe8;
     outline: none;
-    box-shadow: 0 0 12px #ffb3b3;
   }
-  .futuristic-button {
-    background: linear-gradient(90deg, #ffb3b3 0%, #d32f2f 100%);
-    color: #fff;
+  .whiteblue-button {
+    background: linear-gradient(90deg, #a2e1fa 0%, #e0e3ea 100%);
+    color: #287fb8;
     border: none;
-    border-radius: 12px;
-    padding: 16px 40px;
-    font-size: 1.18rem;
-    font-family: 'Orbitron', 'Segoe UI', sans-serif;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 1.09rem;
+    font-family: 'Segoe UI', 'Meiryo', sans-serif;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 16px #ffb3b3;
-    transition: background 0.3s, color 0.3s, box-shadow 0.2s;
-    margin-bottom: 20px;
+    box-shadow: 0 2px 8px #bde7f7;
+    transition: background 0.3s, color 0.3s;
+    margin-bottom: 15px;
   }
-  .futuristic-button:disabled {
+  .whiteblue-button:disabled {
     background: #eee;
-    color: #bbb;
+    color: #ccc;
     cursor: not-allowed;
     box-shadow: none;
   }
-  .futuristic-loading {
-    color: #d32f2f;
-    font-family: 'Orbitron', 'Segoe UI', sans-serif;
-    margin-top: 14px;
+  .whiteblue-loading {
+    color: #287fb8;
+    margin-top: 10px;
     text-align: center;
-    font-size: 1.12rem;
-    letter-spacing: 1px;
+    font-size: 1rem;
   }
-  .futuristic-result {
-    margin-top: 38px;
-    background: linear-gradient(90deg, #f5f6fa 60%, #e0e3ea 100%);
-    border-radius: 12px;
-    padding: 20px;
-    color: #d32f2f;
+  .whiteblue-result {
+    margin-top: 20px;
+    background: #f0fbff;
+    border-radius: 10px;
+    padding: 13px;
+    color: #287fb8;
     font-family: 'Fira Mono', 'monospace';
-    box-shadow: 0 0 16px #b0b3b833 inset;
-    border: 2px solid #b0b3b8;
-    width: 100%;              /* コンテナ内で最大 */
-    min-height: 230px;        /* ここで高さ調整（お好みで） */
-    max-height: 400px;        /* より多く表示 */
-    overflow-y: auto;         /* スクロール */
-    font-size: 1.05rem;
-    line-height: 1.6;
+    border: 1.2px solid #bde7f7;
+    min-height: 130px;
+    max-height: 300px;
+    overflow-y: auto;
+    font-size: 1rem;
+    line-height: 1.5;
     word-break: break-all;
     box-sizing: border-box;
   }
-  .futuristic-result pre {
+  .whiteblue-result pre {
     background: none;
-    font-size: inherit;
-    color: inherit;
     padding: 0;
     margin: 0;
     white-space: pre-wrap;
-    word-break: break-all;
+    color: inherit;
   }
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
 `}</style>
     </div>
   );
