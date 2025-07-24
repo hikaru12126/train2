@@ -50,14 +50,14 @@ function App() {
   };
 
   return (
-    <div className="gray-bg">
-      <div className="gray-container">
-        <h2 className="gray-title">JRCM 走行解析アプリ</h2>
+    <div className="red-bg">
+      <div className="red-container">
+        <h2 className="red-title">JRCM 走行解析アプリ</h2>
         <input
           type="file"
           accept=".csv"
           onChange={e => setFile(e.target.files[0])}
-          className="gray-input"
+          className="red-input"
         /><br />
         <textarea
           value={instruction}
@@ -65,7 +65,7 @@ function App() {
           rows={5}
           cols={60}
           placeholder="指示を入力してください"
-          className="gray-textarea"
+          className="red-textarea"
           onKeyDown={e => {
             if (
               e.key === 'Enter' &&
@@ -79,12 +79,12 @@ function App() {
           }}
         ></textarea>
         <br />
-        <button onClick={handleSend} disabled={loading} className="gray-button">
+        <button onClick={handleSend} disabled={loading} className="red-button">
           送信
         </button>
-        {loading && <div className="gray-loading">送信中...</div>}
+        {loading && <div className="red-loading">送信中...</div>}
 
-        <div className="gray-result">
+        <div className="red-result">
           <strong>結果:</strong>
           <pre style={{ whiteSpace: 'pre-wrap' }}>{result ? result.replace(/---BEGIN VEGA---[\s\S]+---END VEGA---/, '') : ''}</pre>
         </div>
@@ -94,83 +94,116 @@ function App() {
             <VegaLite spec={vegaSpec} />
           </div>
         )}
+
+        <details>
+          <summary>AI応答raw表示（開くと詳細）</summary>
+          <pre style={{ whiteSpace: 'pre-wrap', background: '#fff0f0', fontSize: '12px' }}>{result}</pre>
+        </details>
       </div>
-      <style>{`
-        .gray-bg {
-          min-height: 100vh;
-          background: linear-gradient(135deg, #f2f2f2 0%, #d7d7d7 100%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .gray-container {
-          background: rgba(250,250,250,0.97);
-          border-radius: 20px;
-          box-shadow: 0 0 32px #bdbdbd, 0 0 8px #eeeeee inset;
-          padding: 40px 32px;
-          max-width: 600px;
-          width: 100%;
-        }
-        .gray-title {
-          color: #d32f2f;
-          font-family: 'Orbitron', 'Segoe UI', sans-serif;
-          font-size: 2rem;
-          text-align: center;
-          margin-bottom: 32px;
-          letter-spacing: 2px;
-          text-shadow: 0 0 8px #f1c7c7;
-        }
-        .gray-input, .gray-textarea {
-          width: 100%;
-          background: #f7f7f7;
-          color: #222;
-          border: 2px solid #cccccc;
-          border-radius: 8px;
-          padding: 10px;
-          margin-bottom: 16px;
-          font-size: 1rem;
-          font-family: 'Segoe UI', 'monospace';
-          transition: border 0.2s;
-        }
-        .gray-input:focus, .gray-textarea:focus {
-          border: 2px solid #888;
-          outline: none;
-        }
-        .gray-button {
-          background: linear-gradient(90deg, #bdbdbd 0%, #888888 100%);
-          color: #fff;
-          border: none;
-          border-radius: 8px;
-          padding: 12px 32px;
-          font-size: 1.1rem;
-          font-family: 'Orbitron', 'Segoe UI', sans-serif;
-          font-weight: bold;
-          cursor: pointer;
-          box-shadow: 0 0 8px #bdbdbd;
-          transition: background 0.3s, color 0.3s;
-        }
-        .gray-button:disabled {
-          background: #eee;
-          color: #bbb;
-          cursor: not-allowed;
-        }
-        .gray-loading {
-          color: #333;
-          font-family: 'Orbitron', 'Segoe UI', sans-serif;
-          margin-top: 10px;
-          text-align: center;
-        }
-        .gray-result {
-          margin-top: 32px;
-          background: rgba(220, 220, 220, 0.16);
-          border-radius: 8px;
-          padding: 16px;
-          color: #222;
-          font-family: 'Fira Mono', 'monospace';
-          box-shadow: 0 0 8px #e3e3e3 inset;
-        }
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
-      `}</style>
+<style>{`
+  .futuristic-bg {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f6fa 0%, #e0e3ea 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .futuristic-container {
+    background: #f8f9fb;
+    border-radius: 28px;
+    box-shadow: 0 8px 40px #b0b3b8, 0 0 0px #e0e3ea inset;
+    padding: 56px 40px 36px 40px;
+    max-width: 540px;   /* 元のサイズを維持 */
+    width: 100%;        /* レスポンシブ */
+    border: 2px solid #e0e3ea;
+    position: relative;
+  }
+  .futuristic-title {
+    color: #d32f2f;
+    font-family: 'Orbitron', 'Segoe UI', sans-serif;
+    font-size: 2.3rem;
+    text-align: center;
+    margin-bottom: 38px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 16px #ffb3b3, 0 0 2px #fff;
+    border-radius: 12px;
+    padding: 12px 0;
+  }
+  .futuristic-input, .futuristic-textarea {
+    width: 100%;
+    background: #f5f6fa;
+    color: #d32f2f;
+    border: 2px solid #b0b3b8;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 20px;
+    font-size: 1.08rem;
+    font-family: 'Segoe UI', 'monospace';
+    transition: border 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 12px #e0e3ea33;
+  }
+  .futuristic-input:focus, .futuristic-textarea:focus {
+    border: 2px solid #d32f2f;
+    outline: none;
+    box-shadow: 0 0 12px #ffb3b3;
+  }
+  .futuristic-button {
+    background: linear-gradient(90deg, #ffb3b3 0%, #d32f2f 100%);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px 40px;
+    font-size: 1.18rem;
+    font-family: 'Orbitron', 'Segoe UI', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 16px #ffb3b3;
+    transition: background 0.3s, color 0.3s, box-shadow 0.2s;
+    margin-bottom: 20px;
+  }
+  .futuristic-button:disabled {
+    background: #eee;
+    color: #bbb;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .futuristic-loading {
+    color: #d32f2f;
+    font-family: 'Orbitron', 'Segoe UI', sans-serif;
+    margin-top: 14px;
+    text-align: center;
+    font-size: 1.12rem;
+    letter-spacing: 1px;
+  }
+  .futuristic-result {
+    margin-top: 38px;
+    background: linear-gradient(90deg, #f5f6fa 60%, #e0e3ea 100%);
+    border-radius: 12px;
+    padding: 20px;
+    color: #d32f2f;
+    font-family: 'Fira Mono', 'monospace';
+    box-shadow: 0 0 16px #b0b3b833 inset;
+    border: 2px solid #b0b3b8;
+    width: 100%;              /* コンテナ内で最大 */
+    min-height: 230px;        /* ここで高さ調整（お好みで） */
+    max-height: 400px;        /* より多く表示 */
+    overflow-y: auto;         /* スクロール */
+    font-size: 1.05rem;
+    line-height: 1.6;
+    word-break: break-all;
+    box-sizing: border-box;
+  }
+  .futuristic-result pre {
+    background: none;
+    font-size: inherit;
+    color: inherit;
+    padding: 0;
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+`}</style>
     </div>
   );
 }
