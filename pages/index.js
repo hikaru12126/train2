@@ -97,7 +97,7 @@ function App() {
           </div>
         )}
 
-        {/* ←この位置にだけstyle */}
+        {/* 最新style: 縦表示を大きく、縦スクロール対応 */}
         <style>{`
           .whiteblue-bg {
             min-height: 100vh;
@@ -117,7 +117,7 @@ function App() {
             position: relative;
           }
           .whiteblue-title {
-            color: #d32f2f; /* 赤 */
+            color: #d32f2f;
             font-family: 'Segoe UI', 'Meiryo', sans-serif;
             font-size: 2rem;
             text-align: center;
@@ -176,9 +176,10 @@ function App() {
             color: #287fb8;
             font-family: 'Fira Mono', 'monospace';
             border: 1.2px solid #bde7f7;
-            min-height: 130px;
-            max-height: 300px;
-            overflow-y: auto;
+            min-height: 300px;   /* 縦幅を大きく（ここをUP） */
+            max-height: 70vh;    /* 画面高さの70%まで可変に */
+            overflow-y: auto;    /* 縦スクロール常時有効 */
+            overflow-x: auto;    /* 横スクロールも有効化 */
             font-size: 1rem;
             line-height: 1.5;
             word-break: break-all;
@@ -190,6 +191,7 @@ function App() {
             margin: 0;
             white-space: pre-wrap;
             color: inherit;
+            min-height: 200px;
           }
         `}</style>
       </div>
