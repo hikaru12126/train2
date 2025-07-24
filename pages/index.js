@@ -50,14 +50,14 @@ function App() {
   };
 
   return (
-    <div className="red-bg">
-      <div className="red-container">
-        <h2 className="red-title">JRCM 走行解析アプリ</h2>
+    <div className="gray-bg">
+      <div className="gray-container">
+        <h2 className="gray-title">JRCM 走行解析アプリ</h2>
         <input
           type="file"
           accept=".csv"
           onChange={e => setFile(e.target.files[0])}
-          className="red-input"
+          className="gray-input"
         /><br />
         <textarea
           value={instruction}
@@ -65,7 +65,7 @@ function App() {
           rows={5}
           cols={60}
           placeholder="指示を入力してください"
-          className="red-textarea"
+          className="gray-textarea"
           onKeyDown={e => {
             if (
               e.key === 'Enter' &&
@@ -79,12 +79,12 @@ function App() {
           }}
         ></textarea>
         <br />
-        <button onClick={handleSend} disabled={loading} className="red-button">
+        <button onClick={handleSend} disabled={loading} className="gray-button">
           送信
         </button>
-        {loading && <div className="red-loading">送信中...</div>}
+        {loading && <div className="gray-loading">送信中...</div>}
 
-        <div className="red-result">
+        <div className="gray-result">
           <strong>結果:</strong>
           <pre style={{ whiteSpace: 'pre-wrap' }}>{result ? result.replace(/---BEGIN VEGA---[\s\S]+---END VEGA---/, '') : ''}</pre>
         </div>
@@ -94,42 +94,37 @@ function App() {
             <VegaLite spec={vegaSpec} />
           </div>
         )}
-
-        <details>
-          <summary>AI応答raw表示（開くと詳細）</summary>
-          <pre style={{ whiteSpace: 'pre-wrap', background: '#fff0f0', fontSize: '12px' }}>{result}</pre>
-        </details>
       </div>
       <style>{`
-        .red-bg {
+        .gray-bg {
           min-height: 100vh;
-          background: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
+          background: linear-gradient(135deg, #f2f2f2 0%, #d7d7d7 100%);
           display: flex;
           align-items: center;
           justify-content: center;
         }
-        .red-container {
-          background: rgba(255,255,255,0.97);
+        .gray-container {
+          background: rgba(250,250,250,0.97);
           border-radius: 20px;
-          box-shadow: 0 0 32px #ffb3b3, 0 0 8px #ffeaea inset;
+          box-shadow: 0 0 32px #bdbdbd, 0 0 8px #eeeeee inset;
           padding: 40px 32px;
           max-width: 600px;
           width: 100%;
         }
-        .red-title {
+        .gray-title {
           color: #d32f2f;
           font-family: 'Orbitron', 'Segoe UI', sans-serif;
           font-size: 2rem;
           text-align: center;
           margin-bottom: 32px;
           letter-spacing: 2px;
-          text-shadow: 0 0 8px #ffb3b3;
+          text-shadow: 0 0 8px #f1c7c7;
         }
-        .red-input, .red-textarea {
+        .gray-input, .gray-textarea {
           width: 100%;
-          background: #fff5f5;
-          color: #d32f2f;
-          border: 2px solid #ffb3b3;
+          background: #f7f7f7;
+          color: #222;
+          border: 2px solid #cccccc;
           border-radius: 8px;
           padding: 10px;
           margin-bottom: 16px;
@@ -137,12 +132,12 @@ function App() {
           font-family: 'Segoe UI', 'monospace';
           transition: border 0.2s;
         }
-        .red-input:focus, .red-textarea:focus {
-          border: 2px solid #d32f2f;
+        .gray-input:focus, .gray-textarea:focus {
+          border: 2px solid #888;
           outline: none;
         }
-        .red-button {
-          background: linear-gradient(90deg, #ffb3b3 0%, #d32f2f 100%);
+        .gray-button {
+          background: linear-gradient(90deg, #bdbdbd 0%, #888888 100%);
           color: #fff;
           border: none;
           border-radius: 8px;
@@ -151,36 +146,28 @@ function App() {
           font-family: 'Orbitron', 'Segoe UI', sans-serif;
           font-weight: bold;
           cursor: pointer;
-          box-shadow: 0 0 8px #ffb3b3;
+          box-shadow: 0 0 8px #bdbdbd;
           transition: background 0.3s, color 0.3s;
         }
-        .red-button:disabled {
+        .gray-button:disabled {
           background: #eee;
           color: #bbb;
           cursor: not-allowed;
         }
-        .red-loading {
-          color: #d32f2f;
+        .gray-loading {
+          color: #333;
           font-family: 'Orbitron', 'Segoe UI', sans-serif;
           margin-top: 10px;
           text-align: center;
         }
-        .red-result {
+        .gray-result {
           margin-top: 32px;
-          background: rgba(255, 179, 179, 0.12);
+          background: rgba(220, 220, 220, 0.16);
           border-radius: 8px;
           padding: 16px;
           color: #222;
           font-family: 'Fira Mono', 'monospace';
-          box-shadow: 0 0 8px #ffb3b3 inset;
-        }
-        details {
-          margin-top: 24px;
-        }
-        summary {
-          cursor: pointer;
-          color: #d32f2f;
-          font-weight: bold;
+          box-shadow: 0 0 8px #e3e3e3 inset;
         }
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
       `}</style>
