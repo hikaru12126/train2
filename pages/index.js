@@ -22,7 +22,7 @@ function App() {
       formData.append('csv', file);
       formData.append('userInstruction', instruction);
 
-      const res = await fetch('http://localhost:3001/api/chat', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         body: formData,
       });
