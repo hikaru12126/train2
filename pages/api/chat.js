@@ -19,12 +19,22 @@ async function handler(req, res) {
   const form = formidable({ multiples: false });
 
   form.parse(req, async (err, fields, files) => {
+    // ▼ デバッグ用ログ
+    console.log('==== フォーム受信 ====');
     console.log('fields:', fields);
     console.log('files:', files);
 
     if (err) {
       res.status(500).json({ error: 'ファイル解析エラー', detail: String(err) });
       return;
+    }
+
+    // デバッグ: ファイルの実体を確認
+    if (files?.csv) {
+      console.log('アップロードCSVファイル実体:', files.csv);
+      const file = Array.isArray(files.csv) ? files.csv[0] : files.csv;
+      const exists = file?.filepath ? fs.existsSync(file.filepath) : 'no_path';
+      console.log('csv.filepath:', file?.filepath, 'exists:', exists);
     }
 
     const requestAt = new Date().toISOString();
@@ -37,9 +47,12 @@ async function handler(req, res) {
     let buffer = null;
     if (filepath && fs.existsSync(filepath)) {
       buffer = fs.readFileSync(filepath);
+    } else {
+      console.log('CSVファイルパスが不正 or 存在しません:', filepath);
     }
 
     if (!buffer || buffer.length === 0) {
+      console.log('CSVファイルがありません or バッファ長=0');
       res.status(400).json({ error: 'CSVファイルがありません' });
       return;
     }
@@ -53,6 +66,10 @@ async function handler(req, res) {
           .on('end', resolve)
           .on('error', reject);
       });
+
+      // デバッグ: パース結果を出す
+      console.log('==== CSVパース結果 ====');
+      console.log(results);
 
       const tableSample = results.length > 10 ? results.slice(0, 10) : results;
       const tableText = tableSample.map(row => JSON.stringify(row)).join('\n');
@@ -76,7 +93,10 @@ ${tableText}
 
 「${userInstruction}」
 `;
-      // ▲＝＝＝ここまで＝＝＝▲
+
+      // デバッグ: プロンプト内容出力
+      console.log('==== AIへ送るprompt ====');
+      console.log(prompt);
 
       try {
         const chatCompletion = await openai.chat.completions.create({
@@ -95,7 +115,9 @@ ${tableText}
 
         const aiText = chatCompletion.choices?.[0]?.message?.content || 'AI応答なし';
 
-        // ログ出力の部分はそのまま
+        // デバッグ: AIからの返答(全文)
+        console.log('==== AI回答 ====');
+        console.log(aiText);
 
         res.status(200).json({ result: aiText });
       } catch (apiError) {
