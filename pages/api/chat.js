@@ -51,7 +51,13 @@ export default async function handler(req, res) {
       await new Promise((resolve, reject) => {
         Readable.from(buffer)
           .pipe(csvParser())
-          .on('data', row => results.push(row))
+          .on('data', row => {
+            // ←★ここでV[km/h]を数値型に変換！
+            if (row['V[km/h]'] !== undefined) {
+              row['V[km/h]'] = Number(row['V[km/h]']);
+            }
+            results.push(row);
+          })
           .on('end', resolve)
           .on('error', reject);
       });
