@@ -56,9 +56,8 @@ export default async function handler(req, res) {
           .on('error', reject);
       });
 
-      // サンプルデータ生成
-      const tableSample = results.length > 10 ? results.slice(0, 10) : results;
-      const tableText = tableSample.map(row => JSON.stringify(row)).join('\n');
+      // サンプルデータ生成（全件に修正）
+      const tableText = results.map(row => JSON.stringify(row)).join('\n');
 
       // プロンプト作成
       const prompt = `
