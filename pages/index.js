@@ -22,7 +22,7 @@ function App() {
       formData.append('csv', file);
       formData.append('userInstruction', instruction);
 
-      const res = await fetch('/api/chat', {
+      const res = await fetch('http://localhost:3001/api/chat', {
         method: 'POST',
         body: formData,
       });
@@ -36,6 +36,15 @@ function App() {
         if (m && m[1]) {
           let vegaRaw = m[1].trim();
           vegaRaw = vegaRaw.replace(/^```json\s*/, '').replace(/```$/, '').trim();
+
+          // フィールド名のreplace（必要に応じて）
+          vegaRaw = vegaRaw.replace(/"V\[Km\/h\]"/g, '"speed"');
+          vegaRaw = vegaRaw.replace(/"速度（km\/h）"/g, '"speed"');
+          vegaRaw = vegaRaw.replace(/"速度"/g, '"speed"');
+          vegaRaw = vegaRaw.replace(/"day"/g, '"time"');
+          vegaRaw = vegaRaw.replace(/"時間"/g, '"time"');
+          vegaRaw = vegaRaw.replace(/"時刻"/g, '"time"');
+
           try {
             setVegaSpec(JSON.parse(vegaRaw));
           } catch (e) {
@@ -92,21 +101,7 @@ function App() {
           </pre>
         </div>
 
-        {/* ★ このブロックを追加！AI応答の生全文表示用 */}
-        <div className="whiteblue-result">
-          <strong>AI応答全文（デバッグ用）:</strong>
-          <pre style={{
-            whiteSpace: 'pre-wrap',
-            color: '#2c2c2c',
-            fontSize: '14px',
-            background: '#f6f6f2',
-            marginTop: '13px',
-            padding: '10px',
-            borderRadius: '7px'
-          }}>
-            {result}
-          </pre>
-        </div>
+        {/* ここ（AI応答全文デバッグ用ブロック）は削除済み */}
 
         {vegaSpec && (
           <div style={{ marginTop: 22 }}>
