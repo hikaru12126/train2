@@ -31,6 +31,7 @@ function App() {
       setResult(data.result || data.error);
 
       if (data.result) {
+        // AI返答の---BEGIN VEGA---〜---END VEGA---間を抽出してセットする
         const m = data.result.match(/---BEGIN VEGA---([\s\S]+?)---END VEGA---/);
         if (m && m[1]) {
           let vegaRaw = m[1].trim();
@@ -91,13 +92,28 @@ function App() {
           </pre>
         </div>
 
+        {/* ★ このブロックを追加！AI応答の生全文表示用 */}
+        <div className="whiteblue-result">
+          <strong>AI応答全文（デバッグ用）:</strong>
+          <pre style={{
+            whiteSpace: 'pre-wrap',
+            color: '#2c2c2c',
+            fontSize: '14px',
+            background: '#f6f6f2',
+            marginTop: '13px',
+            padding: '10px',
+            borderRadius: '7px'
+          }}>
+            {result}
+          </pre>
+        </div>
+
         {vegaSpec && (
           <div style={{ marginTop: 22 }}>
             <VegaLite spec={vegaSpec} />
           </div>
         )}
 
-        {/* 最新style: 縦表示を大きく、縦スクロール対応 */}
         <style>{`
           .whiteblue-bg {
             min-height: 100vh;
@@ -176,10 +192,10 @@ function App() {
             color: #287fb8;
             font-family: 'Fira Mono', 'monospace';
             border: 1.2px solid #bde7f7;
-            min-height: 300px;   /* 縦幅を大きく（ここをUP） */
-            max-height: 70vh;    /* 画面高さの70%まで可変に */
-            overflow-y: auto;    /* 縦スクロール常時有効 */
-            overflow-x: auto;    /* 横スクロールも有効化 */
+            min-height: 80px;
+            max-height: 70vh;
+            overflow-y: auto;
+            overflow-x: auto;
             font-size: 1rem;
             line-height: 1.5;
             word-break: break-all;
@@ -191,7 +207,7 @@ function App() {
             margin: 0;
             white-space: pre-wrap;
             color: inherit;
-            min-height: 200px;
+            min-height: 20px;
           }
         `}</style>
       </div>
