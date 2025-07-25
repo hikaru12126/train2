@@ -56,29 +56,31 @@ export default async function handler(req, res) {
           .on('error', reject);
       });
 
-      // サンプルデータ生成（全件に修正）
+      // 全件サンプルをAIへ送る
       const tableText = results.map(row => JSON.stringify(row)).join('\n');
 
-      // プロンプト作成
+      // プロンプト作成　※カラム名に必ず day , V[km/h] を指定
       const prompt = `
 以下はCSVの一部データです。指示に従い分析や解説を行い、もしグラフ生成の指示があれば、以下のフォーマットで必ずVega-Lite形式のJSONを出力してください。
 グラフ部分は
 ---BEGIN VEGA---
 {Vega-Lite JSON}
 ---END VEGA---
-の間に必ずJSONのみ記載すること。
-説明文→Vega部分の順で出力してください。
+の間に必ずJSONのみ記載すること。説明文→Vega部分の順で出力してください。
 
 例：
 ---BEGIN VEGA---
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "来場者数推移グラフ",
-  "data": {"values": [ {"月":"1月","来場者数":123}, {"月":"2月","来場者数":200} ]},
+  "description": "速度推移グラフ",
+  "data": {"values": [
+    {"day": "2025/6/23/9:23", "V[km/h]": 0},
+    {"day": "2025/6/23/9:24", "V[km/h]": 10}
+  ]},
   "mark": "line",
   "encoding": {
-    "x": {"field": "月", "type": "ordinal"},
-    "y": {"field": "来場者数", "type": "quantitative"}
+    "x": {"field": "day", "type": "ordinal", "title": "時間"},
+    "y": {"field": "V[km/h]", "type": "quantitative", "title": "速度(km/h)"}
   }
 }
 ---END VEGA---
@@ -94,7 +96,7 @@ ${tableText}
           messages: [
             {
               role: "system",
-              content: "あなたは交通データの専門家であり、もしグラフ化が指示された場合はVega-Lite形式のJSONとして---BEGIN VEGA---と---END VEGA---の間に必ずJSONコードのみ出力してください。"
+              content: "あなたは交通データの専門家であり、もしグラフ化が指示された場合はVega-Lite形式のJSONとして---BEGIN VEGA---と---END VEGA---の間に必ずJSONコードのみ出力してください。フィールド名はCSVファイルヘッダー(day, V[km/h])と必ず一致させてください。"
             },
             { role: "user", content: prompt }
           ],
@@ -105,7 +107,6 @@ ${tableText}
         const aiText = chatCompletion.choices?.[0]?.message?.content || 'AI応答なし';
 
         // --- ログ出力 ここから ---
-        // Vercel本番環境ではファイル書き込みをスキップ
         if (process.env.VERCEL !== "1") {
           const logDir = path.join(process.cwd(), 'logs');
           if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
