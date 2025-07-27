@@ -71,8 +71,11 @@ async function handler(req, res) {
       console.log('==== CSVパース結果 ====');
       console.log(results);
 
-      const tableSample = results.length > 10 ? results.slice(0, 10) : results;
-      const tableText = tableSample.map(row => JSON.stringify(row)).join('\n');
+      // ▼＝＝＝ここを修正＝＝＝▼
+      // const tableSample = results.length > 10 ? results.slice(0, 10) : results;
+      // const tableText = tableSample.map(row => JSON.stringify(row)).join('\n');
+      const tableText = results.map(row => JSON.stringify(row)).join('\n');
+      // ▲＝＝＝ここまで＝＝＝▲
 
       // ▼＝＝＝プロンプト修正＝＝＝▼
       const prompt = `
